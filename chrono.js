@@ -1,4 +1,6 @@
-/* chrono.js - TB/TS updated, UI bubble buttons, Calibri font */
+/* chrono.js - racchiuso in DOMContentLoaded per far funzionare i tasti */
+document.addEventListener('DOMContentLoaded', () => {
+
 let startTs = null;
 let timerInterval = null;
 let elapsedBefore = 0;
@@ -52,7 +54,6 @@ function updateDisplay(ms) {
 /* START / STOP */
 startBtn.addEventListener('click', () => {
   if (timerInterval) {
-    // stop
     clearInterval(timerInterval);
     timerInterval = null;
     elapsedBefore += Date.now() - startTs;
@@ -60,7 +61,6 @@ startBtn.addEventListener('click', () => {
     startBtn.textContent = "Start";
     lapBtn.disabled = true;
   } else {
-    // start
     startTs = Date.now();
     timerInterval = setInterval(() => {
       updateDisplay(elapsedBefore + (Date.now() - startTs));
@@ -70,7 +70,7 @@ startBtn.addEventListener('click', () => {
   }
 });
 
-/* LAP: salva solo il tempo dal lap precedente */
+/* LAP */
 lapBtn.addEventListener('click', () => {
   const now = Date.now();
   const current = elapsedBefore + (startTs ? now - startTs : 0);
@@ -91,12 +91,12 @@ resetBtn.addEventListener('click', () => {
   lapsTable.innerHTML = "";
   startBtn.textContent = "Start";
   lapBtn.disabled = true;
-  refreshSessionsList(); // keep sessions list
+  refreshSessionsList();
   updateAverage();
   updateTimeStudy();
 });
 
-/* RENDER LAPS, evidenzia fastest/slowest */
+/* RENDER LAPS */
 function renderLaps(){
     lapsTable.innerHTML = "";
     if(laps.length===0){
@@ -123,7 +123,7 @@ function renderLaps(){
     updateTimeStudy();
 }
 
-/* MEDIA (TB) = media dei lap in ms */
+/* MEDIA (TB) */
 function updateAverage(){
   if (laps.length === 0) {
     avgLapSpan.textContent = "00:00:00";
@@ -140,11 +140,8 @@ function updateAverage(){
 function updateTimeStudy(){
   if (laps.length === 0) {
     tsValueSpan.textContent = "00:00:00";
-    document.getElementById('baseTime')?.textContent = "00:00:00"; // optional if present elsewhere
     return;
   }
-  const tbText = tbValueSpan.textContent;
-  // compute using numeric ms:
   const total = laps.reduce((s,l)=> s + l.lapMs, 0);
   const tb = total / (laps.length || 1);
   const maj = parseFloat(majInput.value) || 0;
@@ -155,7 +152,7 @@ function updateTimeStudy(){
 /* maj change */
 majInput.addEventListener('input', updateTimeStudy);
 
-/* ----------------- SESSIONS (localStorage) ----------------- */
+/* ----------------- SESSIONS ----------------- */
 function loadSavedSessions(){ return JSON.parse(localStorage.getItem('chrono_sessions') || "{}"); }
 function saveSessions(obj){ localStorage.setItem('chrono_sessions', JSON.stringify(obj)); }
 
@@ -240,9 +237,9 @@ updateAverage();
 updateTimeStudy();
 lapBtn.disabled = true;
 
-/* PWA: install prompt + service worker registration (if present) */
+/* PWA: install prompt + SW */
 let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e)=>{
+window.addEventListener('beforeinstallprompt',(e)=>{
   e.preventDefault();
   deferredPrompt = e;
   const btn = document.createElement('button');
@@ -263,3 +260,5 @@ window.addEventListener('beforeinstallprompt', (e)=>{
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('service-worker.js').then(()=>console.log('SW registered')).catch(e=>console.warn('SW fail', e));
 }
+
+}); // END DOMContentLoaded
