@@ -56,3 +56,30 @@
 <div class="box">
   <div>Media dei tempi (TB): <span id="tbValue">00:00:00</span></div>
   <div>Time Study (TS): <span id="tsValue">00:00:00</span></div>
+  <div>Media Lap: <span id="avgLap">00:00:00</span></div>
+  <div>
+    <label for="maj">Maggiorazione (%)</label>
+    <input type="number" id="maj" value="0">
+  </div>
+</div>
+
+<table id="lapsTable"></table>
+
+<div class="box">
+  <div>
+    <input type="text" id="sessionName" placeholder="Nome sessione">
+    <select id="savedSessions"></select>
+  </div>
+  <div>
+    <button id="saveSession">Salva</button>
+    <button id="loadSession">Carica</button>
+    <button id="deleteSession">Elimina</button>
+    <button id="exportCSV">Esporta CSV</button>
+  </div>
+</div>
+
+<div id="installPrompt"></div>
+
+<script src="chrono.js"></script>
+</body>
+</html>
