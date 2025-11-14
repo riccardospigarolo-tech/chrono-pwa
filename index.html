@@ -1,44 +1,118 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chrono Tessitura Euganea</title>
-<link rel="manifest" href="manifest.json">
-<style>
-  body { font-family: Arial, sans-serif; padding: 20px; }
-  #display { font-size: 3em; margin-bottom: 10px; }
-  #laps div { margin: 2px 0; }
-  .fast { color: green; }
-  .slow { color: red; }
-  button { margin: 2px; padding: 5px 10px; font-size: 1em; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chrono Tessitura Euganea</title>
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3f51b5">
+
+    <style>
+        body {
+            background-color: #3f51b5;
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        h1, h2, h3 {
+            margin-top: 15px;
+        }
+
+        button {
+            background: #ffffff22;
+            color: white;
+            border: 1px solid #ffffff44;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #ffffff33;
+        }
+
+        input, select {
+            background: #ffffff22;
+            color: white;
+            border: 1px solid #ffffff55;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        .lap-fast {
+            color: #00ff88;
+            font-weight: bold;
+        }
+
+        .lap-slow {
+            color: #ff6666;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 15px;
+            border-collapse: collapse;
+        }
+
+        td, th {
+            border-bottom: 1px solid #ffffff33;
+            padding: 8px;
+        }
+    </style>
 </head>
+
 <body>
 
 <h1>Chrono Tessitura Euganea</h1>
-<div id="display">00:00:0</div>
 
-<div>
-  <button id="startBtn">Start</button>
-  <button id="lapBtn">Lap</button>
-  <button id="resetBtn">Reset</button>
+<h2>Tempo</h2>
+<div style="font-size: 40px; margin-bottom: 10px;">
+    <span id="min">00</span>:<span id="cent">00</span>:<span id="mill">00</span>
 </div>
 
-<h3>Lap:</h3>
-<div id="laps"></div>
+<button id="startBtn">Start</button>
+<button id="lapBtn" disabled>Lap</button>
+<button id="resetBtn">Stop / Reset</button>
 
-<h3>Sessioni salvate:</h3>
-<input id="sessionNameInput" placeholder="Nome sessione">
-<button id="saveSessionBtn">Salva</button>
-<button id="loadSessionBtn">Carica</button>
-<button id="deleteSessionBtn">Elimina</button>
-<button id="exportBtn">Esporta CSV</button>
-<select id="savedSessionsSelect"></select>
+<h2>Laps</h2>
+<table>
+    <thead>
+        <tr><th>#</th><th>Tempo Lap</th><th>Cumulato</th></tr>
+    </thead>
+    <tbody id="lapsTable"></tbody>
+</table>
+
+<p>Media Lap: <span id="avgLap">00:00:00</span></p>
+
+<h3>Time Study</h3>
+<label>Maggiorazione (%): </label>
+<input type="number" id="maj" value="0" style="width:80px"> %
+
+<p>Tempo Base: <span id="baseTime">00:00:00</span></p>
+<p>Tempo Standard: <span id="stdTime">00:00:00</span></p>
+
+<h2>Sessioni</h2>
+
+<label>Nome sessione:</label>
+<input type="text" id="sessionName">
+
+<br><br>
+
+<select id="savedSessions"></select>
+<br>
+
+<button id="saveSession">Salva</button>
+<button id="loadSession">Carica</button>
+<button id="deleteSession">Elimina</button>
+<button id="exportCSV">Esporta CSV</button>
 
 <div id="installPrompt"></div>
 
 <script src="chrono.js"></script>
+
 </body>
 </html>
-
