@@ -89,30 +89,31 @@ document.addEventListener('DOMContentLoaded', () => {
     updateTimeStudy();
   });
 
-  function renderLaps(){
-    lapsTable.innerHTML="";
+ function renderLaps(){
+    lapsTable.innerHTML = "";
     if(laps.length===0){
-      updateAverage();
-      updateTimeStudy();
-      return;
+        updateAverage();
+        updateTimeStudy();
+        return;
     }
 
-    const fastest=Math.min(...laps.map(l=>l.lapMs));
-    const slowest=Math.max(...laps.map(l=>l.lapMs));
+    const fastest=Math.min(...laps.map(l => l.lapMs));
+    const slowest=Math.max(...laps.map(l => l.lapMs));
 
+    // Ordine inverso: ultimo lap in cima
     for(let i=laps.length-1;i>=0;i--){
-      const l=laps[i];
-      const tr=document.createElement('tr');
-      const cls=(l.lapMs===fastest)?'lap-fast':(l.lapMs===slowest?'lap-slow':'');
-      tr.innerHTML=`<td style="width:48px">${l.index}</td>
-                    <td class="${cls}">${formatTime(l.lapMs)}</td>
-                    <td>${formatTime(l.cumMs)}</td>`;
-      lapsTable.appendChild(tr);
+        const l=laps[i];
+        const tr=document.createElement('tr');
+        const cls=(l.lapMs===fastest)?'lap-fast':(l.lapMs===slowest?'lap-slow':'');
+        tr.innerHTML=`<td style="width:48px">${l.index}</td>
+                        <td class="${cls}">${formatTime(l.lapMs)}</td>
+                        <td>${formatTime(l.cumMs)}</td>`;
+        lapsTable.appendChild(tr);
     }
 
     updateAverage();
     updateTimeStudy();
-  }
+}
 
   function updateAverage(){
     if(laps.length===0){
@@ -124,3 +125,4 @@ document.addEventListener('DOMContentLoaded', () => {
     const avg=total/laps.length;
     avgLapSpan.textContent=formatTime(avg);
     tbValueSpan.textContent=formatTime(avg);
+
