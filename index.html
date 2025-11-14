@@ -1,118 +1,151 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chrono Tessitura Euganea</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Chrono Tessitura Euganea</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#3f51b5">
 
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#3f51b5">
+<style>
+  /* FONT */
+  body { font-family: "Calibri", Arial, sans-serif; margin:0; background:#3f51b5; color:#fff; padding:18px; -webkit-font-smoothing:antialiased; }
 
-    <style>
-        body {
-            background-color: #3f51b5;
-            color: white;
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
+  /* HEADER */
+  h1 { margin:0 0 12px 0; font-size:24px; letter-spacing:0.5px; }
 
-        h1, h2, h3 {
-            margin-top: 15px;
-        }
+  /* MAIN DISPLAY */
+  .display {
+    font-size:56px;
+    text-align:center;
+    padding:18px;
+    margin-bottom:12px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+    border-radius:14px;
+    box-shadow: 0 8px 0 rgba(0,0,0,0.15), inset 0 -4px 0 rgba(0,0,0,0.08);
+  }
+  .display span { display:inline-block; min-width:60px; }
 
-        button {
-            background: #ffffff22;
-            color: white;
-            border: 1px solid #ffffff44;
-            padding: 10px 15px;
-            border-radius: 6px;
-            margin: 5px;
-            cursor: pointer;
-        }
+  /* BUTTONS - BUBBLE STYLE */
+  .controls { display:flex; gap:10px; justify-content:center; margin:12px 0; flex-wrap:wrap; }
+  .btn {
+    background: linear-gradient(#fff,#fff); /* placeholder to get contrast via mask */
+    background-color: #ffd; /* fall-back */
+    color: #111;
+    border: 4px solid #222;
+    border-radius: 999px;
+    padding: 10px 20px;
+    font-weight:700;
+    box-shadow: 6px 6px 0 rgba(0,0,0,0.25);
+    cursor:pointer;
+    min-width:96px;
+  }
+  .btn:active { transform: translate(2px,2px); box-shadow: 4px 4px 0 rgba(0,0,0,0.18); }
 
-        button:hover {
-            background: #ffffff33;
-        }
+  .btn-primary { background-color:#fff3b0; } /* light comic yellow */
+  .btn-accent { background-color:#fff7d1; }
 
-        input, select {
-            background: #ffffff22;
-            color: white;
-            border: 1px solid #ffffff55;
-            padding: 5px;
-            border-radius: 4px;
-        }
+  /* TABLE LAPS */
+  table { width:100%; border-collapse:collapse; margin-top:12px; }
+  th, td { padding:8px 6px; text-align:left; border-bottom:1px dashed rgba(255,255,255,0.06); }
+  .lap-fast { color:#22ff88; font-weight:700; }
+  .lap-slow { color:#ff6b6b; font-weight:700; }
 
-        .lap-fast {
-            color: #00ff88;
-            font-weight: bold;
-        }
+  /* BOX TB/TS */
+  .ts-box {
+    background: linear-gradient(180deg,#fff9c4,#fff6a5);
+    color:#111;
+    border:6px solid #222;
+    border-radius:14px;
+    padding:12px;
+    margin-top:14px;
+    display:flex;
+    gap:18px;
+    align-items:center;
+    justify-content:space-between;
+    box-shadow: 8px 8px 0 rgba(0,0,0,0.2);
+  }
+  .ts-col { display:flex; flex-direction:column; gap:6px; }
+  .ts-title { font-size:13px; font-weight:700; color:#333; }
+  .ts-value { font-size:20px; font-weight:900; }
 
-        .lap-slow {
-            color: #ff6666;
-            font-weight: bold;
-        }
+  /* INPUTS */
+  input[type="number"], input[type="text"], select {
+    background: rgba(255,255,255,0.08);
+    color: white;
+    border:2px solid rgba(255,255,255,0.12);
+    padding:6px 8px;
+    border-radius:8px;
+  }
 
-        table {
-            width: 100%;
-            margin-top: 15px;
-            border-collapse: collapse;
-        }
+  /* FOOTER / INSTALL */
+  #installPrompt { margin-top:10px; text-align:center; color: #fff9; font-size:13px; }
 
-        td, th {
-            border-bottom: 1px solid #ffffff33;
-            padding: 8px;
-        }
-    </style>
+  /* Responsive */
+  @media (max-width:600px){
+    .display{ font-size:36px; }
+    .ts-box{ flex-direction:column; align-items:flex-start; }
+  }
+</style>
 </head>
-
 <body>
 
 <h1>Chrono Tessitura Euganea</h1>
 
-<h2>Tempo</h2>
-<div style="font-size: 40px; margin-bottom: 10px;">
-    <span id="min">00</span>:<span id="cent">00</span>:<span id="mill">00</span>
+<div class="display" aria-live="polite">
+  <span id="min">00</span>:<span id="cent">00</span>:<span id="mill">00</span>
 </div>
 
-<button id="startBtn">Start</button>
-<button id="lapBtn" disabled>Lap</button>
-<button id="resetBtn">Stop / Reset</button>
+<div class="controls">
+  <button id="startBtn" class="btn btn-primary">Start</button>
+  <button id="lapBtn" class="btn btn-accent" disabled>Lap</button>
+  <button id="resetBtn" class="btn">Stop / Reset</button>
+</div>
 
-<h2>Laps</h2>
-<table>
-    <thead>
-        <tr><th>#</th><th>Tempo Lap</th><th>Cumulato</th></tr>
-    </thead>
-    <tbody id="lapsTable"></tbody>
+<h2 style="margin-top:18px;font-size:16px;">Laps</h2>
+<table aria-label="Elenco giri">
+  <thead>
+    <tr><th style="width:48px">#</th><th>Tempo Lap</th><th>Cumulato</th></tr>
+  </thead>
+  <tbody id="lapsTable"></tbody>
 </table>
 
-<p>Media Lap: <span id="avgLap">00:00:00</span></p>
+<!-- BOX DEDICATO TB / TS -->
+<div class="ts-box" aria-hidden="false">
+  <div class="ts-col">
+    <div class="ts-title">Tempo Base (TB) — media dei lap</div>
+    <div id="tbValue" class="ts-value">00:00:00</div>
+    <div style="font-size:12px;color:#333">aggiornamento in tempo reale</div>
+  </div>
 
-<h3>Time Study</h3>
-<label>Maggiorazione (%): </label>
-<input type="number" id="maj" value="0" style="width:80px"> %
+  <div class="ts-col" style="align-items:flex-end;">
+    <div class="ts-title">Maggiorazione (%)</div>
+    <input type="number" id="maj" value="0" style="width:100px">
+    <div style="height:8px"></div>
+    <div class="ts-title">Tempo Standard (TS)</div>
+    <div id="tsValue" class="ts-value">00:00:00</div>
+  </div>
+</div>
 
-<p>Tempo Base: <span id="baseTime">00:00:00</span></p>
-<p>Tempo Standard: <span id="stdTime">00:00:00</span></p>
+<p style="margin-top:14px;font-size:13px;color:#fff9">Media Lap: <span id="avgLap">00:00:00</span></p>
 
-<h2>Sessioni</h2>
+<h2 style="margin-top:18px;font-size:16px;">Sessioni</h2>
+<label for="sessionName" style="display:block;margin-bottom:6px">Nome sessione</label>
+<input id="sessionName" type="text" placeholder="Es: Linea A - turno 1" style="width:60%">
 
-<label>Nome sessione:</label>
-<input type="text" id="sessionName">
+<div style="margin-top:10px;">
+  <select id="savedSessions" style="width:60%;"></select>
+</div>
 
-<br><br>
-
-<select id="savedSessions"></select>
-<br>
-
-<button id="saveSession">Salva</button>
-<button id="loadSession">Carica</button>
-<button id="deleteSession">Elimina</button>
-<button id="exportCSV">Esporta CSV</button>
+<div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
+  <button id="saveSession" class="btn btn-accent">Salva</button>
+  <button id="loadSession" class="btn">Carica</button>
+  <button id="deleteSession" class="btn">Elimina</button>
+  <button id="exportCSV" class="btn btn-primary">Esporta CSV</button>
+</div>
 
 <div id="installPrompt"></div>
 
 <script src="chrono.js"></script>
-
 </body>
 </html>
