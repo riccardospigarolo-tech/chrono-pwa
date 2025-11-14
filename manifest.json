@@ -1,7 +1,7 @@
 {
   "name": "Cronometro Aziendale",
   "short_name": "Cronometro",
-  "start_url": "chrono.html",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#f4f4f4",
   "theme_color": "#2196f3",
@@ -17,4 +17,5 @@
       "type": "image/png"
     }
   ]
+
 }
