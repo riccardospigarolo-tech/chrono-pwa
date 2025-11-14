@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chrono Tessitura Euganea</title>
+<link rel="manifest" href="manifest.json">
+<style>
+  body { font-family: Arial, sans-serif; padding: 20px; }
+  #display { font-size: 3em; margin-bottom: 10px; }
+  #laps div { margin: 2px 0; }
+  .fast { color: green; }
+  .slow { color: red; }
+  button { margin: 2px; padding: 5px 10px; font-size: 1em; }
+</style>
+</head>
+<body>
+
+<h1>Chrono Tessitura Euganea</h1>
+<div id="display">00:00:0</div>
+
+<div>
+  <button id="startBtn">Start</button>
+  <button id="lapBtn">Lap</button>
+  <button id="resetBtn">Reset</button>
+</div>
+
+<h3>Lap:</h3>
+<div id="laps"></div>
+
+<h3>Sessioni salvate:</h3>
+<input id="sessionNameInput" placeholder="Nome sessione">
+<button id="saveSessionBtn">Salva</button>
+<button id="loadSessionBtn">Carica</button>
+<button id="deleteSessionBtn">Elimina</button>
+<button id="exportBtn">Esporta CSV</button>
+<select id="savedSessionsSelect"></select>
+
+<div id="installPrompt"></div>
+
+<script src="chrono.js"></script>
+</body>
+</html>
+
