@@ -281,9 +281,7 @@ exportBtn.addEventListener('click', ()=>{
     ]);
   });
 
-  const csv = rows
-    .map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(","))
-    .join("\n");
+  const csv = rows.map(r => r.join(",")).join("\r\n");
 
   const blob = new Blob([csv], { type:'text/csv' });
   const url = URL.createObjectURL(blob);
@@ -304,3 +302,4 @@ updateTimeStudy();
 lapBtn.disabled = true;
 
 }); // END DOMContentLoaded
+
