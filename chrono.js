@@ -6,6 +6,9 @@ let timerInterval = null;
 let elapsedBefore = 0;
 let laps = [];
 
+/* NEW: anteprima lap corrente */
+let liveLapPreview = null;
+
 /* DOM */
 const minSpan = document.getElementById('min');
 const centSpan = document.getElementById('cent');
@@ -76,17 +79,30 @@ startBtn.addEventListener('click', () => {
     timerInterval = null;
     elapsedBefore += Date.now() - startTs;
     startTs = null;
+    liveLapPreview = null; // stop anteprima
+    renderLaps();
     startBtn.textContent = "Start";
     lapBtn.disabled = true;
   } else {
     startTs = Date.now();
     timerInterval = setInterval(() => {
-      updateDisplay(elapsedBefore + (Date.now() - startTs));
+      const cur = elapsedBefore + (Date.now() - startTs);
+      updateDisplay(cur);
+      updateLiveLapPreview(cur);  // <-- anteprima
     }, 20);
     startBtn.textContent = "Stop";
     lapBtn.disabled = false;
   }
 });
+
+/* NEW: anteprima lap */
+function updateLiveLapPreview(currentMs) {
+  if (laps.length < 1) return; // anteprima dal 2° lap in poi
+  const lastCum = laps[laps.length - 1].cumMs;
+  const lapMs = currentMs - lastCum;
+  liveLapPreview = { index: laps.length + 1, lapMs: lapMs, cumMs: currentMs };
+  renderLaps();
+}
 
 /* LAP */
 lapBtn.addEventListener('click', () => {
@@ -94,7 +110,10 @@ lapBtn.addEventListener('click', () => {
   const current = elapsedBefore + (startTs ? now - startTs : 0);
   const lastCum = laps.length ? laps[laps.length - 1].cumMs : 0;
   const lapMs = current - lastCum;
+
   laps.push({ index: laps.length + 1, lapMs: lapMs, cumMs: current });
+
+  liveLapPreview = null; // azzera anteprima
   renderLaps();
 });
 
@@ -105,6 +124,7 @@ resetBtn.addEventListener('click', () => {
   startTs = null;
   elapsedBefore = 0;
   laps = [];
+  liveLapPreview = null;
   updateDisplay(0);
   lapsTable.innerHTML = "";
   startBtn.textContent = "Start";
@@ -117,6 +137,7 @@ resetBtn.addEventListener('click', () => {
 /* RENDER LAPS */
 function renderLaps(){
     lapsTable.innerHTML = "";
+
     if(laps.length===0){
         updateAverage();
         updateTimeStudy();
@@ -130,168 +151,6 @@ function renderLaps(){
         const l=laps[i];
         const tr=document.createElement('tr');
         const cls=(l.lapMs===fastest)?'lap-fast':(l.lapMs===slowest?'lap-slow':'');
+
         tr.innerHTML=`<td style="width:48px">${l.index}</td>
-                        <td class="${cls}">${formatTime(l.lapMs)}</td>
-                        <td>${formatTime(l.cumMs)}</td>`;
-        lapsTable.appendChild(tr);
-    }
-
-    updateAverage();
-    updateTimeStudy();
-}
-
-/* MEDIA */
-function updateAverage(){
-  if (laps.length === 0) {
-    avgLapSpan.textContent = "00:00:000";
-    tbValueSpan.textContent = "00:00:000";
-    return;
-  }
-  const total = laps.reduce((s, l) => s + l.lapMs, 0);
-  const avg = total / laps.length;
-  avgLapSpan.textContent = formatTime(avg);
-  tbValueSpan.textContent = formatTime(avg);
-}
-
-/* TS = TB * (1 + maj/100) */
-function updateTimeStudy(){
-  if (laps.length === 0) {
-    tsValueSpan.textContent = "00:00:000";
-    return;
-  }
-  const total = laps.reduce((s,l)=> s + l.lapMs, 0);
-  const tb = total / (laps.length || 1);
-  const maj = parseFloat(majInput.value) || 0;
-  const ts = tb * (1 + maj / 100);
-  tsValueSpan.textContent = formatTime(Math.round(ts));
-}
-
-majInput.addEventListener('input', updateTimeStudy);
-
-/* ----------------- SESSIONS ----------------- */
-function loadSavedSessions(){ return JSON.parse(localStorage.getItem('chrono_sessions') || "{}"); }
-function saveSessions(obj){ localStorage.setItem('chrono_sessions', JSON.stringify(obj)); }
-
-function refreshSessionsList(){
-  savedSessionsSelect.innerHTML = "";
-  const obj = loadSavedSessions();
-  Object.keys(obj).forEach(k=>{
-    const opt = document.createElement('option');
-    opt.value = k;
-    opt.textContent = k;
-    savedSessionsSelect.appendChild(opt);
-  });
-}
-
-/* SAVE */
-saveSessionBtn.addEventListener('click', ()=>{
-  const name = sessionNameInput.value.trim() || `session_${new Date().toISOString()}`;
-  const obj = loadSavedSessions();
-  obj[name] = { created: new Date().toLocaleString(), laps: laps, totalMs: elapsedBefore + (startTs ? Date.now() - startTs : 0) };
-  saveSessions(obj);
-  refreshSessionsList();
-});
-
-/* LOAD */
-loadSessionBtn.addEventListener('click', ()=>{
-  const key = savedSessionsSelect.value;
-  if (!key) return;
-  const obj = loadSavedSessions();
-  const s = obj[key];
-  if (!s) return;
-  laps = s.laps || [];
-  elapsedBefore = s.totalMs || 0;
-  startTs = null;
-  clearInterval(timerInterval);
-  timerInterval = null;
-  startBtn.textContent = "Start";
-  lapBtn.disabled = true;
-  updateDisplay(elapsedBefore);
-  renderLaps();
-});
-
-/* DELETE */
-deleteSessionBtn.addEventListener('click', ()=>{
-  const key = savedSessionsSelect.value;
-  if (!key) return;
-  const obj = loadSavedSessions();
-  delete obj[key];
-  saveSessions(obj);
-  refreshSessionsList();
-});
-
-/* ------------- EXPORT CSV (CORRETTO) ------------- */
-exportBtn.addEventListener('click', ()=>{
-  const key = savedSessionsSelect.value;
-  let toExport;
-  const obj = loadSavedSessions();
-
-  if (key) toExport = obj[key];
-  else
-    toExport = {
-      created: new Date().toLocaleString(),
-      laps: laps,
-      totalMs: elapsedBefore + (startTs ? Date.now() - startTs : 0)
-    };
-
-  if (!toExport) return;
-
-  const rows = [["Index","Lap (ms)","Lap (fmt)","Cumulato (ms)","Cumulato (fmt)"]];
-
-  (toExport.laps || []).forEach(l => {
-    rows.push([
-      l.index,
-      l.lapMs,
-      formatTime(l.lapMs),
-      l.cumMs,
-      formatTime(l.cumMs)
-    ]);
-  });
-
-  const csv = rows
-    .map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(","))
-    .join("\n");
-
-  const blob = new Blob([csv], { type:'text/csv' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = (key || 'session') + ".csv";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-});
-
-/* INIT */
-refreshSessionsList();
-updateDisplay(0);
-updateAverage();
-updateTimeStudy();
-lapBtn.disabled = true;
-
-/* PWA */
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt',(e)=>{
-  e.preventDefault();
-  deferredPrompt = e;
-  const btn = document.createElement('button');
-  btn.textContent = 'Installa App';
-  btn.className = 'btn btn-primary';
-  btn.style.position='fixed';
-  btn.style.right='18px';
-  btn.style.bottom='18px';
-  btn.addEventListener('click', async ()=>{
-    deferredPrompt.prompt();
-    const choice = await deferredPrompt.userChoice;
-    deferredPrompt = null;
-    btn.remove();
-  });
-  document.getElementById('installPrompt').appendChild(btn);
-});
-
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('service-worker.js').then(()=>console.log('SW registered')).catch(e=>console.warn('SW fail', e));
-}
-
-}); // END DOMContentLoaded
+                      <td class="${cls}">${formatTime(l.lapMs
