@@ -29,8 +29,8 @@
   /* BUTTONS - BUBBLE STYLE */
   .controls { display:flex; gap:10px; justify-content:center; margin:12px 0; flex-wrap:wrap; }
   .btn {
-    background: linear-gradient(#fff,#fff); /* placeholder to get contrast via mask */
-    background-color: #ffd; /* fall-back */
+    background: linear-gradient(#fff,#fff);
+    background-color: #ffd;
     color: #111;
     border: 4px solid #222;
     border-radius: 999px;
@@ -42,7 +42,7 @@
   }
   .btn:active { transform: translate(2px,2px); box-shadow: 4px 4px 0 rgba(0,0,0,0.18); }
 
-  .btn-primary { background-color:#fff3b0; } /* light comic yellow */
+  .btn-primary { background-color:#fff3b0; }
   .btn-accent { background-color:#fff7d1; }
 
   /* TABLE LAPS */
@@ -72,7 +72,7 @@
   /* INPUTS */
   input[type="number"], input[type="text"], select {
     background: rgba(255,255,255,0.08);
-    color: black;
+    color: white !important;
     border:2px solid rgba(255,255,255,0.12);
     padding:6px 8px;
     border-radius:8px;
@@ -81,7 +81,6 @@
   /* FOOTER / INSTALL */
   #installPrompt { margin-top:10px; text-align:center; color: #fff9; font-size:13px; }
 
-  /* Responsive */
   @media (max-width:600px){
     .display{ font-size:36px; }
     .ts-box{ flex-direction:column; align-items:flex-start; }
@@ -110,11 +109,11 @@
   <tbody id="lapsTable"></tbody>
 </table>
 
-<!-- BOX DEDICATO TB / TS -->
-<div class="ts-box" aria-hidden="false">
+<!-- BOX DEDICATO TB / TS + CAPI / ORA -->
+<div class="ts-box">
   <div class="ts-col">
     <div class="ts-title">Tempo Base (TB) — media dei lap</div>
-    <div id="tbValue" class="ts-value">00:00:00</div>
+    <div id="tbValue" class="ts-value">00:00:000</div>
     <div style="font-size:12px;color:#333">aggiornamento in tempo reale</div>
   </div>
 
@@ -122,14 +121,21 @@
     <div class="ts-title">Maggiorazione (%)</div>
     <input type="number" id="maj" value="0" style="width:100px">
     <div style="height:8px"></div>
+
     <div class="ts-title">Tempo Standard (TS)</div>
-    <div id="tsValue" class="ts-value">00:00:00</div>
+
+    <div style="display:flex; align-items:center; gap:8px;">
+      <div id="tsValue" class="ts-value">00:00:000</div>
+      <div id="capsHour" class="ts-value" style="font-size:16px; font-weight:700; color:#000;"></div>
+    </div>
+
   </div>
 </div>
 
-<p style="margin-top:14px;font-size:13px;color:#fff9">Media Lap: <span id="avgLap">00:00:00</span></p>
+<p style="margin-top:14px;font-size:13px;color:#fff9">Media Lap: <span id="avgLap">00:00:000</span></p>
 
 <h2 style="margin-top:18px;font-size:16px;">Sessioni</h2>
+
 <label for="sessionName" style="display:block;margin-bottom:6px">Nome sessione</label>
 <input id="sessionName" type="text" placeholder="Es: Linea A - turno 1" style="width:60%">
 
