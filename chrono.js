@@ -31,6 +31,17 @@ const tbValueSpan = document.getElementById('tbValue');
 const tsValueSpan = document.getElementById('tsValue');
 const majInput = document.getElementById('maj');
 
+/* ---- TESTO BIANCO NEI CAMPI ---- */
+sessionNameInput.style.color = "white";
+savedSessionsSelect.style.color = "white";
+
+/* ---- NUOVO: SPAN CAPO/ORA ACCANTO AL TS ---- */
+const capsHourSpan = document.createElement("span");
+capsHourSpan.style.marginLeft = "12px";
+capsHourSpan.style.fontWeight = "bold";
+capsHourSpan.style.color = "#000";
+tsValueSpan.parentNode.appendChild(capsHourSpan);
+
 /* FORMAT: mm:CC:MMM */
 function formatTime(ms) {
   if (!isFinite(ms) || ms <= 0) return "00:00:000";
@@ -186,17 +197,28 @@ function updateAverage(){
   tbValueSpan.textContent = formatTime(avg);
 }
 
-/* TS = TB * (1 + maj/100) */
+/* TS = TB * (1 + maj/100) + CAPO/ORA */
 function updateTimeStudy(){
   if (laps.length === 0) {
     tsValueSpan.textContent = "00:00:000";
+    capsHourSpan.textContent = "";
     return;
   }
+
   const total = laps.reduce((s,l)=> s + l.lapMs, 0);
-  const tb = total / (laps.length || 1);
+  const tb = total / laps.length;
   const maj = parseFloat(majInput.value) || 0;
+
   const ts = tb * (1 + maj / 100);
+
+  /* TS rimane identico */
   tsValueSpan.textContent = formatTime(Math.round(ts));
+
+  /* CAPO ORA SOLO INFORMATIVO */
+  const tsMinutes = ts / 60000;
+  const capsOra = tsMinutes > 0 ? Math.floor(60 / tsMinutes) : 0;
+
+  capsHourSpan.textContent = ` → ${capsOra} capi/ora`;
 }
 
 majInput.addEventListener('input', updateTimeStudy);
@@ -302,4 +324,3 @@ updateTimeStudy();
 lapBtn.disabled = true;
 
 }); // END DOMContentLoaded
-
